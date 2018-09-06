@@ -565,6 +565,17 @@ endif
 " ==============================
 
 " ---------------------------------------------------------------------
+" netrw#TransformFilePath {{{2
+fun! netrw#TransformFilePath(fname)
+"  call Dfunc("netrw#TransformFilePath(fname<".a:fname.">)")
+  if strlen(substitute(a:fname, '[^/]', '', 'g')) == 2 && strridx(a:fname, "/") + 1 != strlen(a:fname)
+  " only append when using two slashes but missing the end-slash
+"  call Dret("netrw#TransformFilePath")
+    return a:fname . "/"
+  endif
+"  call Dret("netrw#TransformFilePath")
+  return a:fname
+endfun
 " netrw#BalloonHelp: {{{2
 if v:version >= 700 && has("balloon_eval") && has("syntax") && exists("g:syntax_on") && !exists("g:netrw_nobeval")
 " call Decho("loading netrw#BalloonHelp()",'~'.expand("<slnum>"))
@@ -1887,7 +1898,7 @@ fun! netrw#NetRead(mode,...)
     let ichoice= ichoice + 1
 
    else
-    exe "let choice= a:" . ichoice
+    exe "let choice= netrw#TransformFilePath(a:" . ichoice . ")"
 "    call Decho("no lastfile: choice<" . choice . ">",'~'.expand("<slnum>"))
 
     if match(choice,"?") == 0
@@ -2316,7 +2327,7 @@ fun! netrw#NetWrite(...) range
     let choice = b:netrw_lastfile
     let ichoice= ichoice + 1
    else
-    exe "let choice= a:" . ichoice
+    exe "let choice= netrw#TransformFileName(a:" . ichoice . ")"
 
     " Reconstruct Choice when choice starts with '"'
     if match(choice,"?") == 0
